@@ -3,8 +3,9 @@ import time
 import pandas as pd
 import glob
 import random
-
 import sys
+import yaml
+
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QProgressBar, QPushButton, QScrollArea
 from PyQt5.QtCore import Qt, QBasicTimer
 from PyQt5.QtWidgets import *
@@ -103,8 +104,11 @@ def query_abuse(ip, api_key):
     
 # Main function to read CSV, process IPs and write results
 def process_ips(progress, step, file_path):
-    virus_api = 'REPLACE'
-    abuse_api = 'REPLACE2'
+    # get api keys
+    with open('keys.yaml', 'r') as file:
+        data = yaml.safe_load(file)
+    virus_api = data['virus_api_key']
+    abuse_api = data['abuse_api_key']
 
     #csv_files = glob.glob('*.csv')
     try:
