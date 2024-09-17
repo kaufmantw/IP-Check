@@ -3,8 +3,9 @@ import time
 import pandas as pd
 import glob
 import random
-
 import sys
+import yaml
+
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QProgressBar, QPushButton, QScrollArea
 from PyQt5.QtCore import Qt, QBasicTimer
 from PyQt5.QtWidgets import *
@@ -12,6 +13,11 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtGui import QMouseEvent
 
+from LoadingWindow import LoadingWindow
+from ClickableLabel import ClickableLabel
+
+
+'''
 class LoadingWindow(QDialog):
     def __init__(self, file_path, parent=None):
         self.file_path = file_path
@@ -30,7 +36,7 @@ class LoadingWindow(QDialog):
         msg_layout = QVBoxLayout()
 
         self.setWindowTitle('Confirmation')
-        warning_lbl = QLabel('Are you sure you want to scan the IPs of ' + self.file_path + '?')
+        warning_lbl = QLabel('Are you sure you want to scan the IPs of ' + self.file_path + '?\nUsing column \"ip\"')
 
         msg_layout.addWidget(warning_lbl)
         msg_layout.addWidget(self.progress)
@@ -103,8 +109,11 @@ def query_abuse(ip, api_key):
     
 # Main function to read CSV, process IPs and write results
 def process_ips(progress, step, file_path):
-    virus_api = 'REPLACE'
-    abuse_api = 'REPLACE2'
+    # get api keys
+    with open('keys.yaml', 'r') as file:
+        data = yaml.safe_load(file)
+    virus_api = data['virus_api_key']
+    abuse_api = data['abuse_api_key']
 
     #csv_files = glob.glob('*.csv')
     try:
@@ -115,16 +124,16 @@ def process_ips(progress, step, file_path):
 
         # number of IPs to check + 1 operation for converting to csv
         num_tasks = len(ips)
-        print('num of tasks: ' + str(num_tasks))
+        #print('num of tasks: ' + str(num_tasks))
         percent_per_task = (int)(100 / num_tasks)
-        print('percent per task: ' + str(percent_per_task))
+        #print('percent per task: ' + str(percent_per_task))
 
         # check the IPs. Record the data to output_df
         for ip in ips:
             vt_score = query_virustotal(ip, virus_api)
             ab_score = query_abuse(ip, abuse_api)
 
-            print("Processed " + str(ip) + "\nVirusTotal:\t" + str(vt_score) + "\nAbuseIPDB:\t" + str(ab_score) + "\n")
+            #print("Processed " + str(ip) + "\nVirusTotal:\t" + str(vt_score) + "\nAbuseIPDB:\t" + str(ab_score) + "\n")
 
             new_data = {'ip':[ip], 'VirusTotal score':[vt_score], 'AbuseIPDB score':[ab_score]}
             new_row = pd.DataFrame(new_data)
@@ -135,16 +144,21 @@ def process_ips(progress, step, file_path):
             time.sleep(0.25)
         
         # create a new file for the output
+        # should probably sort by VirusTotal
+        output_df = output_df.sort_values(by='VirusTotal score', ascending=False)
         output_df.to_csv('spreadsheets\\output.csv')
+
+        # finish progress bar
         step = 100
         progress.setValue(step)
+
     except IndexError:
         print('error: no csv files in working directory!')
     except Exception as e:
         print('an error has occured: ' + str(e))
 
     return
-
+'''
 def retrieve_image():
     rng = random.randint(1, 4)
     match rng:
