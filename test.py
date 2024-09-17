@@ -9,7 +9,7 @@ class LoadingBarWindow(QWidget):
 
         # Initialize the UI
         self.initUI()
-
+    xd
     def initUI(self):
         # Create a vertical layout
         layout = QVBoxLayout()
