@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import *
 import LoadingWindow
+import re
 from PyQt5.QtGui import QMouseEvent
 
 from LoadingWindow import LoadingWindow
@@ -9,7 +10,10 @@ class ClickableLabel(QLabel):
     def __init__(self, file_path, parent=None):
         self.file_path = file_path
         self.popup = None
-        super().__init__(file_path, parent)
+
+        pattern = r'\\(.+)$'
+        match = re.search(pattern, file_path)
+        super().__init__(match.group(1), parent)
 
     def mousePressEvent(self, event: QMouseEvent):
         if event.button() == 1:  # Left mouse button

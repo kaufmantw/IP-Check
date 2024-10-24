@@ -21,13 +21,14 @@ class LoadingWindow(QDialog):
         #get options for combo box
         self.choice = QComboBox(self)
         self.options = get_options(self)
+        
+        self.progress = QProgressBar(self)
+
         try:
             self.choice.addItems(self.options)
         except TypeError as e:
             print('No columns found. Free to exit')
             self.error_exit()
-
-        self.progress = QProgressBar(self)
 
         # Connect the combo box selection change event to a method
         self.choice.currentIndexChanged.connect(self.on_combobox_changed)
@@ -57,6 +58,10 @@ class LoadingWindow(QDialog):
     def error_exit(self):
         self.confirm_button.clicked.disconnect(self.startProgress)
         self.confirm_button.clicked.connect(self.close)
+
+        # if the spreadsheet is bad, remove unnecessary items on loading screen
+        self.choice.setHidden(True)
+        self.progress.setHidden(True)
         self.warning_lbl.setText('Error in file scanning. You are free to close this page.')
         self.confirm_button.setText('Close')
 
